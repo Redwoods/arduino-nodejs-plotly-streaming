@@ -44,7 +44,7 @@ void loop() {
   int sensorValue = analogRead(PPG_INPUT); // A0
 
   Serial.println(sensorValue);
-  delay(40); // fs = 25 Hz (delay(5) -> fs = 200 Hz ) 
+  delay(50); // fs = 20 Hz (delay(5) -> fs = 200 Hz ) 
 }
 ```
 
