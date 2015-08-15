@@ -157,7 +157,7 @@ Web client (client_ppg.html) uses plotly-basic.js as well as three javascript li
         initFlag = true;
 
     // socket connection to server that sends PPG.  
-    var socket = io.connect('http://203.241.246.60:8000'); // set your ip address if you want to go on-line. 
+    var socket = io.connect('http://localhost:8000'); // set your ip address if you want to go on-line. 
     socket.on('connect', function () {
         socket.on('message', function (msg) {
             // initial plot when first data comes in.
