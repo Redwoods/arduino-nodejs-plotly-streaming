@@ -1,0 +1,126 @@
+<!DOCTYPE html> 
+<head>	
+  <meta charset="utf-8">
+  <title>plotly-basic.js Example: Arduino PPG</title>
+  
+  <!-- D3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <!-- jQuery -->  
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <!-- Plotly.js -->   
+  <script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
+  <!-- socket.io.js -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.js"></script>
+  
+</head>
+
+<body>
+
+<h1> Real-time PPG streaming </h1>
+<hr>
+<!-- Plotly chart will be drawn inside this DIV -->
+<div id="myDiv"> </div>
+<hr>
+
+  <script>
+  /* JAVASCRIPT CODE GOES HERE */
+ 	var streamPlot = document.getElementById('myDiv');
+ 	
+	var xArray = [],  // date-time
+		xTrack = [],  // PPG
+	
+		numPts = 100, // number of data points in x-axis  
+		lastPt = numPts - 1, 
+		dtda = [],  // 1 x 2 array : [date, data]
+		preX=0,
+		initFlag = true;
+
+	// socket connection to server taht sends PPG.	
+	var socket = io.connect('http://localhost:8000'); // set your ip address if you want to go on-line. 
+	socket.on('connect', function () {
+		socket.on('message', function (msg) {
+			// initial plot when first data comes in.
+			if(msg[0]!='' && initFlag){
+				dtda[0]=msg[0];
+				dtda[1]=parseInt(msg[1]);
+				init();
+				initFlag=false;
+			}
+			console.log(msg[0]);
+			console.log(msg[1]);
+			
+			dtda[0]=msg[0];
+			dtda[1] = parseInt(msg[1]); // Convert value to integer
+
+			nextPt();   // streaming PPG
+			// the below code reflesh plot when the differnet new data comes in.
+			// This is not necessary for continuous PPG data that may get the consecutive same value.
+
+			/*if (dtda[1] != preX) {  // plot only when new data comes
+					preX = dtda[1];
+					nextPt();
+			}*/
+								
+		});
+	});	
+
+
+	function init() {  // draw initial screen 
+		// starting point
+		for ( i = 0; i < numPts; i++) {
+			xArray.push(dtda[0]);
+			xTrack.push(dtda[1]);
+		}
+		// draw he starting screen with first sensor data
+		Plotly.plot(streamPlot, data, layout);
+	}
+	
+	function nextPt() {
+
+		xArray.shift();
+		xArray.push(dtda[0]);  // new date-time
+
+		xTrack.shift();
+		xTrack.push(dtda[1]);  // new PPG
+
+		Plotly.redraw(streamPlot);
+
+	}		
+		
+	// data
+	var data = [{
+		x : xArray,
+		y : xTrack,
+		name : 'ppg',
+		mode: "lines",  // "lines+markers"
+		line: {
+		    color: "#ff0000", 
+		    width: 2
+		 }, 
+		marker: {
+		    color: "rgb(255, 0, 255)", 
+		    size: 4, 
+		    line: {
+		      color: "black", 
+		      width: 0.5
+		    }
+		 }
+	}];
+
+	var layout = {
+		xaxis : {
+			title : 'time',
+			domain : [0, 1]
+		},
+		yaxis : {
+			title : 'pulse wave (ppg)',
+			domain : [0, 1],
+			range : [0, 1100]
+		}
+	};
+
+	alert("Realtime PPG streaming launched!");
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "arduino-nodejs-plotly-streaming",
+  "version": "1.0.0",
+  "description": "real-time PPG streaming using plotly-basic.js",
+  "main": "data_ppg.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Redwoods/arduino-nodejs-plotly-streaming.git"
+  },
+  "keywords": [
+    "Arduino",
+    "node.js",
+    "PPG",
+    "plotly",
+    "socket.io"
+  ],
+  "author": "Redwoods Yi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Redwoods/arduino-nodejs-plotly-streaming/issues"
+  },
+  "homepage": "https://github.com/Redwoods/arduino-nodejs-plotly-streaming#readme",
+  "dependencies": {
+    "serialport": "^1.7.4",
+    "socket.io": "^1.3.6"
+  }
+}
