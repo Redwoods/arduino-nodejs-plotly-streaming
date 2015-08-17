@@ -1,0 +1,192 @@
+<!DOCTYPE html> 
+<head>	
+  <meta charset="utf-8">
+  <title>plotly-basic.js Example : time series feedback streaming</title>
+  
+  <!-- D3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <!-- jQuery -->  
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <!-- Plotly.js -->   
+  <script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
+  
+
+</head>
+
+<body>
+<h2> plotly-basic.js Example : time series feedback streaming (Press Run button to start)</h2>
+<!-- Plotly chart will be drawn inside this DIV -->
+<div id="myDiv"></div>
+<hr>
+<div id="streambuttons" class="control-section" align="center">
+		<button class="btn" id="streamtoggle" style="height:36px; width:150px">
+			<i class="icon-play"></i>
+			<span>Run</span>
+		</button>
+</div>
+
+  <script>
+  /* JAVASCRIPT CODE GOES HERE */
+ 	var streamPlot = document.getElementById('myDiv');
+ 	var streamToggle = document.getElementById('streamtoggle');
+
+	var params = {
+		target : 10,
+		p : 0.5,
+		i : 0.05,
+		d : 0.1,
+		noise : 0.5}, 
+		xArray = [], 
+		yTarget = [], 
+		yTrack = [], 
+		feedback = [], 
+		numPts = 200, 
+		delay = 100, 
+		lastPt = numPts - 1, 
+		decayCoefs = [0.3, 0.25, 0.15, 0.1, 0.05], 
+		inputCoefs = [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.15, 0.1, 0.05], 
+		integral = 0, 
+		derivative, 
+		err, 
+		x, 
+		newY, 
+		i, 
+		playInterval;
+
+	function response() {
+		var output = 0;
+		for ( i = 0; i < decayCoefs.length; i++) {
+			output += decayCoefs[i] * yTrack[lastPt - i];
+		}
+		for ( i = 0; i < inputCoefs.length; i++) {
+			output += inputCoefs[i] * feedback[lastPt - i];
+		}
+
+		return output + Math.random() * 0.5;
+		//randNormal(params.noise);
+	}
+
+	function init() {  // initial screen ()
+		for ( i = 0; i < numPts; i++) {
+			xArray.push(i * delay / 1000);
+			yTrack.push(0);
+			yTarget.push(params.target);
+			feedback.push(0);
+		}
+		x = xArray[lastPt];  // starting point of x-axis (time)
+		Plotly.plot(streamPlot, data, layout);
+	}
+	
+	streamToggle.addEventListener('click', function() {
+            var icon = streamToggle.querySelector('i'),
+                text = streamToggle.querySelector('span'),
+                isPlaying = icon.className === 'icon-pause';
+            if(isPlaying) {
+                icon.className = 'icon-play';
+                text.textContent = 'Run';
+                clearInterval(playInterval);
+            } else {
+                icon.className = 'icon-pause';
+                text.textContent = 'Pause';
+                playInterval = setInterval(nextPt, delay);
+            }
+        });
+
+	
+	// data
+	var data = [{
+		x : feedback,
+		y : yTrack,
+		mode: "lines+markers",
+		name : 'return map', 
+		line: {
+		    color: "#1f77b4", 
+		    width: 1
+		  }, 
+		marker: {
+		    color: "rgb(0, 255, 255)", 
+		    size: 6, 
+		    line: {
+		      color: "black", 
+		      width: 0.5
+		    }
+		  }, 
+	  	type: "scatter"
+	}, {
+		x : xArray,
+		y : yTrack,
+		name : 'response',
+		xaxis: 'x2',
+		yaxis : 'y2'
+	}, {
+		x : xArray,
+		y : yTarget,
+		name : 'target',
+		xaxis: 'x2',
+		yaxis : 'y2'
+	}, {
+		x : xArray,
+		y : feedback,
+		name : 'feedback',
+		xaxis: 'x2',
+		yaxis : 'y3'
+	}];
+
+	var layout = {
+		xaxis : {
+			title : 'driving',
+			domain : [0, 0.25]
+		},
+		yaxis : {
+			title : 'response',
+			domain : [0, 1]
+		},
+		xaxis2 : {
+			title : 'Time (s)',
+			domain : [0.35, 1]
+		},
+		yaxis2 : {
+			title : 'signal',
+			domain : [0, 0.7],
+			side: "left", 
+	    		position: 0.32
+		},
+		yaxis3 : {
+			title : 'Control signal',
+			domain : [0.75, 1],
+			side: "left", 
+	    		position: 0.32
+		}
+	};
+
+	function nextPt() {
+		err = yTrack[lastPt] - yTarget[lastPt];
+		integral += err;
+		derivative = yTrack[lastPt] - yTrack[lastPt - 1];
+
+		feedback.shift();
+		feedback.push(-params.p * err - params.i * integral - params.d * derivative);
+
+		newY = response();
+		x += delay / 1000;  // fs = 10 Hz ?
+
+		xArray.shift();
+		xArray.push(x);
+
+		yTarget.shift();
+		yTarget.push(params.target);
+
+		yTrack.shift();
+		yTrack.push(newY);
+
+		Plotly.redraw(streamPlot);
+	}
+
+	//return plotDone;
+	init();
+		
+	//alert("Time series feedback streaming launched!");
+
+  </script>
+</body>
+</html>

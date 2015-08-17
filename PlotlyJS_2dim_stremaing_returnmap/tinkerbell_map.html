@@ -1,0 +1,177 @@
+<!DOCTYPE html> 
+<head>	
+  <meta charset="utf-8">
+  <title>plotly-basic.js Example</title>
+  
+  <!-- D3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <!-- jQuery -->  
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <!-- Plotly.js -->   
+  <script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
+  
+
+</head>
+
+<body>
+<!-- Plotly chart will be drawn inside this DIV -->
+<h2> plotly-basic.js Example: two-dimensional Tinkerbell map streaming</h2>
+
+<div id="myDiv"></div>
+<hr>
+<div id="streambuttons" class="control-section" align="center">
+		<button class="btn" id="streamtoggle" style="height:36px; width:150px">
+			<i class="icon-play"></i>
+			<span>Run</span>
+		</button>
+</div>
+
+  <script>
+  /* JAVASCRIPT CODE GOES HERE */
+ 	var streamPlot = document.getElementById('myDiv');
+ 	var streamToggle = document.getElementById('streamtoggle');
+
+	var params = {
+		a: 0.9, // 0.3
+		b: -0.6013,  // 0.6
+		c: 2.0,
+		d: 0.5}, // 0.27
+		x0 = -0.1,
+		y0 = -0.64,
+		xArray = [],  
+		xTrack = [],
+		yTrack = [],  
+		numPts = 300, // number of data points in x-axis
+		delay = 50,   
+		lastPt = numPts - 1, 
+		nx,
+		hn = [],  // 1 x 2 array : [newX, newYs]
+		playInterval;
+
+	function tinkerbell() {
+		var x1 = 0.0;
+		var y1 = 0.0;
+
+		x1 = xTrack[lastPt] * xTrack[lastPt] - yTrack[lastPt] * yTrack[lastPt] 
+		+ params.a * xTrack[lastPt] + params.b * yTrack[lastPt];
+		y1 = 2 * xTrack[lastPt] * yTrack[lastPt] + params.c * xTrack[lastPt] + params.d * yTrack[lastPt];
+
+		console.log(x1);
+
+		return [x1, y1];  // return array
+	}
+
+	function init() {  // initial screen ()
+		// starting point(x0,y0) = (-0.1,-0.64)
+		for ( i = 0; i < numPts; i++) {
+			xArray.push(i);
+			xTrack.push(x0);
+			yTrack.push(y0);
+		}
+		hn[0] = 0.0;
+		hn[1] = 0.0;
+		nx = lastPt;
+		console.log(lastPt);
+
+		Plotly.plot(streamPlot, data, layout); // initial plot
+	}
+	
+	function nextPt() {
+		
+		hn = tinkerbell();
+		nx += 1;  // data index
+
+		xArray.shift();
+		xArray.push(nx);
+
+		xTrack.shift();
+		xTrack.push(hn[0]);
+
+		yTrack.shift();
+		yTrack.push(hn[1]);
+
+		Plotly.redraw(streamPlot);
+	}
+	
+	streamToggle.addEventListener('click', function() {
+            var icon = streamToggle.querySelector('i'),
+                text = streamToggle.querySelector('span'),
+                isPlaying = icon.className === 'icon-pause';
+            if(isPlaying) {
+                icon.className = 'icon-play';
+                text.textContent = 'Run';
+                clearInterval(playInterval);
+            } else {
+                icon.className = 'icon-pause';
+                text.textContent = 'Pause';
+                playInterval = setInterval(nextPt, delay);  // delay = 100 ms
+            }
+        });
+
+	// data
+	var data = [{
+		x : xTrack,
+		y : yTrack,
+		mode: "markers",  // "lines+markers"
+		name : 'return map', 
+		line: {
+		    color: "#1f77b4", 
+		    width: 1
+		  }, 
+		marker: {
+		    color: "rgb(0, 0, 255)", 
+		    size: 3, 
+		    line: {
+		      color: "black", 
+		      width: 0.5
+		    }
+		  }, 
+	  	type: "scatter"
+	}, {
+		x : xArray,
+		y : xTrack,
+		name : 'Xn',
+		xaxis: 'x2',
+		yaxis : 'y2'
+	}, {
+		x : xArray,
+		y : yTrack,
+		name : 'Yn',
+		xaxis: 'x2',
+		yaxis : 'y3'
+	}];
+
+	var layout = {
+		xaxis : {
+			title : 'xn',
+			domain : [0, 0.3]
+		},
+		yaxis : {
+			title : 'yn',
+			domain : [0, 1]
+		},
+		xaxis2 : {
+			title : 'data index',
+			domain : [0.4, 1]
+		},
+		yaxis2 : {
+			title : 'Xn',
+			domain : [0, 0.5],
+			side: "left", 
+	    		position: 0.35
+		},
+		yaxis3 : {
+			title : 'Yn',
+			domain : [0.5, 1],
+			side: "left", 
+	    		position: 0.35
+		}
+	};
+
+	init();
+		
+	//alert("Tinkerbell streaming launched!");
+
+  </script>
+</body>
+</html>
