@@ -253,4 +253,4 @@ Web client (client_ppg.html) uses plotly-basic.js as well as three javascript li
 ```
 
 ***
-
+Next : [Streaming temperature and humidity from DHT11 sensor](./README_dht11.md)
