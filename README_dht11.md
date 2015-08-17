@@ -403,4 +403,4 @@ Web client (client_dht11.html) uses plotly-basic.js as well as four javascript l
 
 ***
 
-Go to : [plotly-basic.js 2-dimensional streaming Example](./PlotlyJS_2dim_stremaing_returnmap/README_2dim_streaming.md)
+Go to : [plotly-basic.js 2-dimensional streaming Example](./PlotlyJS_2dim_stremaing_returnmap/README.md)
