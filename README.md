@@ -64,6 +64,7 @@ Node.js code (data_ppg.js) uses two npm modules, serialport and socket.io that a
 2. Run node code: `node data_ppg.js`
 
 - Data format (Date, ppg)
+
 ![data format](PPG_snapshots/date_data_format.png)
 
 [code: data_ppg.js]
