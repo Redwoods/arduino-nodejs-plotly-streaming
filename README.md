@@ -9,6 +9,11 @@ In the server side with node.js, data generated through serial port flow into th
 
 In the client side, the streaming data are continuously received via client socket. By using **plotly-basic.js** we can easily plot the streaming data in real time.
 
+## Snapshot of final result
+
+![Screen Shot](PPG_snapshots/ppg1.png) 
+For more figures, please look into the folder 'PPG-snapshots'.
+
 # The three steps to real time streaming
 - Arduino-Easy Pulse sensor circuit and code
 - Node server code using modules; serialport, socket.io
@@ -57,6 +62,9 @@ Node.js code (data_ppg.js) uses two npm modules, serialport and socket.io that a
 
 1. Install npm modules: `npm install`
 2. Run node code: `node data_ppg.js`
+
+- Data format (Date, ppg)
+![data format](PPG_snapshots/date_data_format.png)
 
 [code: data_ppg.js]
 ``` js
@@ -110,8 +118,6 @@ function getDateString() {
 }
 ```
 
-- Data format (Date, ppg)
-![data format](PPG_snapshots/date_data_format.png)
 
 ## [3] Web client
 
@@ -248,7 +254,3 @@ Web client (client_ppg.html) uses plotly-basic.js as well as three javascript li
 
 ***
 
-## Snapshot of final result
-
-![Screen Shot](PPG_snapshots/ppg1.png) 
-For more figures, please look into the folder 'PPG-snapshots'.
