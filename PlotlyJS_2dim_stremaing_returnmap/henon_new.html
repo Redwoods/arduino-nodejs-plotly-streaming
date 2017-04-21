@@ -10,12 +10,13 @@
   <!-- Plotly.js --> <!-- changed to latest plotly-latest.js-->
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <!--<script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>-->
+  
 
 </head>
 
 <body>
 <!-- Plotly chart will be drawn inside this DIV -->
-<h2> plotly-basic.js Example: two-dimensional Tinkerbell map streaming</h2>
+<h2> plotly-basic.js Example: two-dimensional chaotic map: Henon map streaming</h2>
 
 <div id="myDiv"></div>
 <hr>
@@ -32,29 +33,26 @@
  	var streamToggle = document.getElementById('streamtoggle');
 
 	var params = {
-		a: 0.9, // 0.3
-		b: -0.6013,  // 0.6
-		c: 2.0,
-		d: 0.5}, // 0.27
-		x0 = -0.1,
-		y0 = -0.64,
+		a: 1.4,
+		b: 0.3}, 
+		x0 = 0.0,
+		y0 = 0.0,
 		xArray = [],  
 		xTrack = [],
 		yTrack = [],  
-		numPts = 300, // number of data points in x-axis
-		delay = 50,   
+		numPts = 100, // number of data points in x-axis
+		delay = 100,   
 		lastPt = numPts - 1, 
 		nx,
 		hn = [],  // 1 x 2 array : [newX, newYs]
 		playInterval;
 
-	function tinkerbell() {
+	function henon() {
 		var x1 = 0.0;
 		var y1 = 0.0;
 
-		x1 = xTrack[lastPt] * xTrack[lastPt] - yTrack[lastPt] * yTrack[lastPt] 
-		+ params.a * xTrack[lastPt] + params.b * yTrack[lastPt];
-		y1 = 2 * xTrack[lastPt] * yTrack[lastPt] + params.c * xTrack[lastPt] + params.d * yTrack[lastPt];
+		x1 = 1- params.a * xTrack[lastPt] * xTrack[lastPt] + yTrack[lastPt];
+		y1 = params.b * xTrack[lastPt];
 
 		console.log(x1);
 
@@ -62,7 +60,7 @@
 	}
 
 	function init() {  // initial screen ()
-		// starting point(x0,y0) = (-0.1,-0.64)
+		// starting point(x0,y0) = (0,0)
 		for ( i = 0; i < numPts; i++) {
 			xArray.push(i);
 			xTrack.push(x0);
@@ -78,15 +76,17 @@
 	
 	function nextPt() {
 		
-		hn = tinkerbell();
+		hn = henon();
 		nx += 1;  // data index
 
 		xArray.shift();
 		xArray.push(nx);
 
+		//newX = hn[0];
 		xTrack.shift();
 		xTrack.push(hn[0]);
 
+		//newY = hn[1];
 		yTrack.shift();
 		yTrack.push(hn[1]);
 
@@ -108,6 +108,7 @@
             }
         });
 
+	
 	// data
 	var data = [{
 		x : xTrack,
@@ -119,8 +120,8 @@
 		    width: 1
 		  }, 
 		marker: {
-		    color: "rgb(0, 0, 255)", 
-		    size: 3, 
+		    color: "rgb(0, 255, 255)", 
+		    size: 6, 
 		    line: {
 		      color: "black", 
 		      width: 0.5
@@ -169,8 +170,8 @@
 	};
 
 	init();
-		
-	//alert("Tinkerbell streaming launched!");
+	
+	//alert("Henon streaming launched!");
 
   </script>
 </body>
